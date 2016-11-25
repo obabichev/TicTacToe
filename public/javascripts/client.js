@@ -4,8 +4,9 @@ strings = {
     'messageSent': '[out][time]%time%[/time]: [user]%name%[/user]: %text%[/out]',
     'messageReceived': '[in][time]%time%[/time]: [user]%name%[/user]: %text%[/in]',
     'userSplit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] покинул игру.[/sys]',
-    'successHit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] сделал свой ход.[/sys]',
+    // 'successHit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] сделал свой ход.[/sys]',
     'win': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] победил.[/sys]',
+    'newGame': '[sys][time]%time%[/time]: Началась новая игра.[/sys]',
 };
 
 function sendClick(row, column) {
@@ -38,8 +39,12 @@ window.onload = function () {
                 document.getElementById('nextPlayer').innerHTML = 'Очередь игрока ' + msg.next.name;
             }
 
-            if (msg.event == 'successHit') {
-                document.getElementById(msg.data.row + ' ' + msg.data.column).value = msg.data.symbol;
+            // if (msg.event == 'successHit') {
+            //     document.getElementById(msg.data.row + ' ' + msg.data.column).value = msg.data.symbol;
+            // }
+
+            if (msg.data && msg.data.hit){
+                document.getElementById(msg.data.hit.row + ' ' + msg.data.hit.column).value = msg.data.hit.symbol;
             }
 
             if (msg.event == 'connected') {

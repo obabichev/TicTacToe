@@ -18,7 +18,7 @@ io.sockets.on('connection', function (socket) {
         time = (new Date).toLocaleTimeString();
         console.log("MSG:" + name + ":" + JSON.stringify(msg));
 
-        if (msg.event == 'hit') {
+        if (msg.event == 'hit' && !logic.isGameEnd()) {
 
             let hitResult = logic.tryHit(ID, msg.row, msg.column);
             if (hitResult) {
@@ -28,12 +28,18 @@ io.sockets.on('connection', function (socket) {
                         event: 'win',
                         name: name,
                         time: time,
+                        data: hitResult
                     });
-                    io.sockets.json.send({
-                        event: 'newGame',
-                        mapHeight: logic.getMapSize()[0],
-                        mapWidth: logic.getMapSize()[1],
-                    });
+                    var timeId = setTimeout(()=> {
+                        logic.reset();
+                        io.sockets.json.send({
+                            event: 'newGame',
+                            time: time,
+                            mapHeight: logic.getMapSize()[0],
+                            mapWidth: logic.getMapSize()[1],
+                        });
+                    }, 3000);
+
                 } else {
 
                     console.log("Hit success");

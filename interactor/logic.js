@@ -3,8 +3,9 @@
 var height = 5;
 var width = 10;
 
-var map = [];
+var map;
 
+var gameEnd;
 var nextAvailableIndex = 0;
 var players = [];
 var currentPlayer = '';
@@ -12,12 +13,14 @@ var currentPlayer = '';
 init();
 
 function init() {
+    map = [];
     for (let i = 0; i < height; i++) {
         map.push([]);
         for (let j = 0; j < width; j++) {
             map[i].push('');
         }
     }
+    gameEnd = false;
 }
 
 function playerSymbol(index) {
@@ -149,17 +152,25 @@ module.exports = {
         map[row][column] = currentPlayer.symbol;
 
         if (isWin()) {
+            gameEnd = true;
             return {
-                win: currentPlayer
+                win: currentPlayer,
+                hit: {
+                    row: row,
+                    column: column,
+                    symbol: map[row][column]
+                }
             }
         }
 
         nextPlayer();
         return {
             next: currentPlayer,
-            row: row,
-            column: column,
-            symbol: map[row][column]
+            hit: {
+                row: row,
+                column: column,
+                symbol: map[row][column]
+            }
         };
     },
 
@@ -180,5 +191,13 @@ module.exports = {
         players.splice(index, index + 1);
         console.log("Players after delete " + JSON.stringify(players));
         return currentPlayer;
+    },
+
+    reset(){
+        init();
+    },
+
+    isGameEnd(){
+        return gameEnd;
     }
 };
