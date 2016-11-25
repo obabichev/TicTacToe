@@ -2,8 +2,8 @@
 
 var players = require('./players');
 
-var height = 5;
-var width = 10;
+var height = 20;
+var width = 20;
 
 var map = [];
 var gameEnd;

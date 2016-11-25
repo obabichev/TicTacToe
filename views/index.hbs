@@ -1,18 +1,32 @@
-<div id="login">Ваш логин: </div>
-<div id="nextPlayer">Очередь игрока: </div>
-<table>
-    {{#each map}}
-        <tr>
-            {{#each this}}
-                <th><input id="{{@../index}} {{@index}}"
-                        type="submit"
-                           value="{{this}}"
-                           onclick="sendClick({{@../index}}, {{@index}})"/></th>
-            {{/each}}
-        </tr>
-    {{/each}}
-</table>
+<div class="header">
+    <div><h1>MIPT TicTacToe</h1></div>
+    <div><h3 id="login">Ваш логин:</h3></div>
+    <div><h3 id="nextPlayer">Очередь игрока:</h3></div>
+</div>
 
-<div id="log"></div>
-<br>
-<input type="text" id="input" autofocus><input type="submit" id="send" value="Send">
+<div class="container">
+    <div>
+        <table class="map-field">
+            {{#each map}}
+                <tr>
+                    {{#each this}}
+                        <th class="map-item-container"><input id="{{@../index}} {{@index}}"
+                                                              class="map-item"
+                                                              type="submit"
+                                                              value="{{this}}"
+                                                              onclick="sendClick({{@../index}}, {{@index}})"/></th>
+                    {{/each}}
+                </tr>
+            {{/each}}
+        </table>
+    </div>
+</div>
+
+<div class="chat">
+    <div>
+        <div id="log"></div>
+        <div>
+            <input type="text" id="input"><input type="submit" id="send" value="Send">
+        </div>
+    </div>
+</div>
