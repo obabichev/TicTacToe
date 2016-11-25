@@ -58,7 +58,62 @@ function createName(playerId) {
     return 'Player' + playerSymbol(playerId);
 }
 
+function isWin() {
+    let symbol = currentPlayer.symbol;
+
+    function thereIsWinRow(i, j) {
+        for (let k = 0; k < 5; k++) {
+            if (j + k >= width || map[i][j + k] != symbol) {
+                return;
+            }
+        }
+        return true;
+    }
+
+    function thereIsWinColumn(i, j) {
+        for (let k = 0; k < 5; k++) {
+            if (i + k >= height || map[i + k][j] != symbol) {
+                return;
+            }
+        }
+        return true;
+    }
+
+    function thereIsWinFallingDiagonal(i, j) {
+        for (let k = 0; k < 5; k++) {
+            if (i + k >= height || j + k >= width || map[i + k][j + k] != symbol) {
+                return;
+            }
+        }
+        return true;
+    }
+
+    function thereIsWinRisingDiagonal(i, j) {
+        for (let k = 0; k < 5; k++) {
+            if (i + k >= height || j - k < 0 || map[i + k][j - k] != symbol) {
+                return;
+            }
+        }
+        return true;
+    }
+
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            if (thereIsWinRow(i, j)
+                || thereIsWinColumn(i, j)
+                || thereIsWinFallingDiagonal(i, j)
+                || thereIsWinRisingDiagonal(i, j)) {
+                return true;
+            }
+        }
+    }
+}
+
 module.exports = {
+
+    getMapSize: function () {
+        return [height, width];
+    },
 
     getMap: function () {
         return map;
@@ -93,9 +148,15 @@ module.exports = {
 
         map[row][column] = currentPlayer.symbol;
 
+        if (isWin()) {
+            return {
+                win: currentPlayer
+            }
+        }
+
         nextPlayer();
         return {
-            next: currentPlayer.id,
+            next: currentPlayer,
             row: row,
             column: column,
             symbol: map[row][column]

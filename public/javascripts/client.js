@@ -1,14 +1,15 @@
 strings = {
-    'connected': '[sys][time]%time%[/time]: Вы успешно соединились к сервером как [user]%name%[/user].[/sys]',
-    'userJoined': '[sys][time]%time%[/time]: Пользователь [user]%name%[/user] присоединился к чату.[/sys]',
+    'connected': '[sys][time]%time%[/time]: Вы успешно соединились с сервером как [user]%name%[/user].[/sys]',
+    'userJoined': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] присоединился к игре.[/sys]',
     'messageSent': '[out][time]%time%[/time]: [user]%name%[/user]: %text%[/out]',
     'messageReceived': '[in][time]%time%[/time]: [user]%name%[/user]: %text%[/in]',
-    'userSplit': '[sys][time]%time%[/time]: Пользователь [user]%name%[/user] покинул чат.[/sys]',
-    'successHit': '[sys][time]%time%[/time]: Пользователь [user]%name%[/user] сделал свой ход.[/sys]',
+    'userSplit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] покинул игру.[/sys]',
+    'successHit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] сделал свой ход.[/sys]',
+    'win': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] победил.[/sys]',
 };
 
 function sendClick(row, column) {
-    socket.send({row: row, column: column});
+    socket.send({event: 'hit', row: row, column: column});
 }
 
 window.onload = function () {
@@ -21,29 +22,43 @@ window.onload = function () {
 
         socket.on('message', function (msg) {
             console.log(JSON.stringify(msg));
-            document.querySelector('#log').innerHTML +=
-                strings[msg.event]
-                    .replace(/\[([a-z]+)\]/g, '<span class="$1">')
-                    .replace(/\[\/[a-z]+\]/g, '</span>')
-                    .replace(/\%time\%/, msg.time)
-                    .replace(/\%name\%/, msg.name)
-                    .replace(/\%text\%/, !msg.text?'':unescape(msg.text).replace('<', '&lt;').replace('>', '&gt;')) +
-                '<br>';
+            if (strings[msg.event]) {
+                document.querySelector('#log').innerHTML +=
+                    strings[msg.event]
+                        .replace(/\[([a-z]+)\]/g, '<span class="$1">')
+                        .replace(/\[\/[a-z]+\]/g, '</span>')
+                        .replace(/\%time\%/, msg.time)
+                        .replace(/\%name\%/, msg.name)
+                        .replace(/\%text\%/, !msg.text ? '' : unescape(msg.text).replace('<', '&lt;').replace('>', '&gt;')) +
+                    '<br>';
+            }
             document.querySelector('#log').scrollTop = document.querySelector('#log').scrollHeight;
 
-            if (msg.event == 'successHit'){
+            if (msg.next) {
+                document.getElementById('nextPlayer').innerHTML = 'Очередь игрока ' + msg.next.name;
+            }
+
+            if (msg.event == 'successHit') {
                 document.getElementById(msg.data.row + ' ' + msg.data.column).value = msg.data.symbol;
             }
 
-            if (msg.event == 'connected'){
+            if (msg.event == 'connected') {
                 document.getElementById('login').innerHTML = 'Ваш логин: ' + msg.name;
+            }
+
+            if (msg.event == 'newGame'){
+                for (let i = 0; i < msg.mapHeight; i++){
+                    for (let j = 0; j < msg.mapWidth; j++){
+                        document.getElementById(i + ' ' + j).value = '';
+                    }
+                }
             }
 
         });
 
         document.querySelector('#input').onkeypress = function (e) {
             if (e.which == '13') {
-                socket.send(escape(document.querySelector('#input').value));
+                socket.send({event: 'message', text: escape(document.querySelector('#input').value)});
                 document.querySelector('#input').value = '';
             }
         };
