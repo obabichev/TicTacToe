@@ -1,14 +1,12 @@
 'use strict';
 
+var players = require('./players');
+
 var height = 5;
 var width = 10;
 
-var map;
-
+var map = [];
 var gameEnd;
-var nextAvailableIndex = 0;
-var players = [];
-var currentPlayer = '';
 
 init();
 
@@ -23,46 +21,8 @@ function init() {
     gameEnd = false;
 }
 
-function playerSymbol(index) {
-    switch (index) {
-        case 0:
-            return 'X';
-        case 1:
-            return 'O';
-        default:
-            return index - 1;
-    }
-}
-
-function nextPlayer() {
-
-    let index = indexOfCurrentPlayer();
-    index += 1;
-    if (index >= players.length) {
-        index = 0;
-    }
-    currentPlayer = players[index];
-}
-
-function indexOfCurrentPlayer() {
-    return indexOfPlayer(currentPlayer.id)
-}
-
-function indexOfPlayer(playerId) {
-    for (let i in players) {
-        if (players[i].id == playerId) {
-            return parseInt(i);
-        }
-    }
-    return -1;
-}
-
-function createName(playerId) {
-    return 'Player' + playerSymbol(playerId);
-}
-
 function isWin() {
-    let symbol = currentPlayer.symbol;
+    let symbol = players.getCurrentPlayer().symbol;
 
     function thereIsWinRow(i, j) {
         for (let k = 0; k < 5; k++) {
@@ -122,26 +82,8 @@ module.exports = {
         return map;
     },
 
-    getCurrentPlayer(){
-        return currentPlayer;
-    },
-
-    addPlayer(playerId){
-        players.push({
-            id: playerId,
-            symbol: playerSymbol(nextAvailableIndex),
-            name: createName(nextAvailableIndex),
-        });
-        if (players.length == 1) {
-            currentPlayer = players[0];
-        }
-        nextAvailableIndex += 1;
-        console.log("Player " + playerId + " added");
-        return currentPlayer;
-    },
-
     tryHit(playerId, row, column){
-        if (playerId != currentPlayer.id) {
+        if (playerId != players.getCurrentPlayer().id) {
             return;
         }
 
@@ -149,12 +91,12 @@ module.exports = {
             return;
         }
 
-        map[row][column] = currentPlayer.symbol;
+        map[row][column] = players.getCurrentPlayer().symbol;
 
         if (isWin()) {
             gameEnd = true;
             return {
-                win: currentPlayer,
+                win: players.getCurrentPlayer(),
                 hit: {
                     row: row,
                     column: column,
@@ -163,34 +105,15 @@ module.exports = {
             }
         }
 
-        nextPlayer();
+        players.nextPlayer();
         return {
-            next: currentPlayer,
+            next: players.getCurrentPlayer(),
             hit: {
                 row: row,
                 column: column,
                 symbol: map[row][column]
             }
         };
-    },
-
-    getPlayer(playerId){
-        for (let i in players) {
-            let player = players[i];
-            if (playerId == player.id) {
-                return player;
-            }
-        }
-    },
-
-    deletePlayer(playerId){
-        if (playerId == currentPlayer.id) {
-            nextPlayer();
-        }
-        let index = indexOfPlayer(playerId);
-        players.splice(index, index + 1);
-        console.log("Players after delete " + JSON.stringify(players));
-        return currentPlayer;
     },
 
     reset(){

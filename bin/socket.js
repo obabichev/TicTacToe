@@ -2,17 +2,26 @@
 
 var io = require('socket.io').listen(8080);
 var logic = require('../interactor/logic');
+var players = require('../interactor/players');
+
+function welcomeNewUser(socket, name) {
+    socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer()});
+    socket.broadcast.json.send({event: 'userJoined', name: name, 'time': time()});
+}
+
+function time() {
+    return (new Date).toLocaleTimeString();
+}
 
 io.sockets.on('connection', function (socket) {
 
     var ID = (socket.id).toString();
-    logic.addPlayer(ID);
+    players.addPlayer(ID);
 
-    var name = logic.getPlayer(ID).name;
+    var name = players.getPlayer(ID).name;
     var time = (new Date).toLocaleTimeString();
 
-    socket.json.send({'event': 'connected', 'name': name, 'time': time, next: logic.getCurrentPlayer()});
-    socket.broadcast.json.send({'event': 'userJoined', 'name': name, 'time': time});
+    welcomeNewUser(socket, name);
 
     socket.on('message', function (msg) {
         time = (new Date).toLocaleTimeString();
@@ -47,7 +56,7 @@ io.sockets.on('connection', function (socket) {
                         event: 'successHit',
                         name: name,
                         time: time,
-                        next: logic.getCurrentPlayer(),
+                        next: players.getCurrentPlayer(),
                         data: hitResult
                     });
                 }
@@ -62,11 +71,8 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         var time = (new Date).toLocaleTimeString();
-        io.sockets.json.send({'event': 'userSplit', 'name': name, 'time': time, next: logic.getCurrentPlayer()});
-        logic.deletePlayer(ID);
+        io.sockets.json.send({'event': 'userSplit', 'name': name, 'time': time, next: players.getCurrentPlayer()});
+        players.deletePlayer(ID);
     });
 });
 
-console.log("socket created");
-
-module.exports = {};
