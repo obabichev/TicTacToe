@@ -1,4 +1,17 @@
+<div id="login">Ваш логин: </div>
 
+<table>
+    {{#each map}}
+        <tr>
+            {{#each this}}
+                <th><input id="{{@../index}} {{@index}}"
+                        type="submit"
+                           value="{{this}}"
+                           onclick="sendClick({{@../index}}, {{@index}})"/></th>
+            {{/each}}
+        </tr>
+    {{/each}}
+</table>
 
 <div id="log"></div>
 <br>
