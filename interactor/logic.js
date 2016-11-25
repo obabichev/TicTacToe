@@ -9,11 +9,14 @@ var nextAvailableIndex = 0;
 var players = [];
 var currentPlayer = '';
 
+init();
 
-for (let i = 0; i < height; i++) {
-    map.push([]);
-    for (let j = 0; j < width; j++) {
-        map[i].push('');
+function init() {
+    for (let i = 0; i < height; i++) {
+        map.push([]);
+        for (let j = 0; j < width; j++) {
+            map[i].push('');
+        }
     }
 }
 
@@ -42,7 +45,7 @@ function indexOfCurrentPlayer() {
     return indexOfPlayer(currentPlayer.id)
 }
 
-function indexOfPlayer(playerId){
+function indexOfPlayer(playerId) {
     for (let i in players) {
         if (players[i].id == playerId) {
             return parseInt(i);
@@ -51,7 +54,7 @@ function indexOfPlayer(playerId){
     return -1;
 }
 
-function createName(playerId){
+function createName(playerId) {
     return 'Player' + playerSymbol(playerId);
 }
 
@@ -75,7 +78,7 @@ module.exports = {
             currentPlayer = players[0];
         }
         nextAvailableIndex += 1;
-        console.log("player " + playerId + " added");
+        console.log("Player " + playerId + " added");
         return currentPlayer;
     },
 
