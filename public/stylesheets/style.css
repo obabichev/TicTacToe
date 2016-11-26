@@ -33,12 +33,12 @@ body {
 }
 
 .chat {
-    /*width: 590px;*/
     width: 100%;
     text-align: center;
 }
 
 #log {
+    text-align: left;
     width: 50%;
     margin: 8px 8px 8px 25%;
     height: 290px;
