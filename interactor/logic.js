@@ -92,7 +92,7 @@ module.exports = {
         }
 
         map[row][column] = players.getCurrentPlayer().symbol;
-        let hitResult = {row: row, column: column, symbol: map[row][column]}
+        let hitResult = {row: row, column: column, symbol: map[row][column]};
 
         if (isWin()) {
             gameEnd = true;

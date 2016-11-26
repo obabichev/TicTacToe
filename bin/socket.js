@@ -4,8 +4,8 @@ var io = require('socket.io').listen(8080);
 var logic = require('../interactor/logic');
 var players = require('../interactor/players');
 
-var ID;
-var name;
+// var ID;
+// var name;
 
 function welcomeNewUser(socket, name) {
     socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer()});
@@ -18,16 +18,16 @@ function time() {
 
 io.sockets.on('connection', function (socket) {
 
-    ID = (socket.id).toString();
+    let ID = (socket.id).toString();
     players.addPlayer(ID);
 
-    name = players.getPlayer(ID).name;
+    let name = players.getPlayer(ID).name;
 
     welcomeNewUser(socket, name);
 
     socket.on('message', onMessage);
 
-    socket.on('disconnect', onDisconnect);
+    socket.on('disconnect', onDisconnect(ID, name));
 
     function onMessage(msg) {
         console.log("MSG:" + name + ":" + JSON.stringify(msg));
@@ -48,6 +48,7 @@ io.sockets.on('connection', function (socket) {
 
     function tryHit(row, column) {
         let hitResult = logic.tryHit(ID, row, column);
+        console.log(JSON.stringify(hitResult));
         if (hitResult) {
             if (hitResult.win) {
                 notifyAboutWin(hitResult);
@@ -90,8 +91,10 @@ io.sockets.on('connection', function (socket) {
     }
 });
 
-function onDisconnect() {
-    io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
-    players.deletePlayer(ID);
+function onDisconnect(ID, name) {
+    return () => {
+        io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
+        players.deletePlayer(ID);
+    }
 }
 

@@ -68,6 +68,8 @@ module.exports = {
         }
         nextAvailableIndex += 1;
         console.log("Player " + playerId + " added");
+        console.log("Players after adding " + JSON.stringify(players));
+
         return currentPlayer;
     },
 
