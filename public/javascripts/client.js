@@ -56,16 +56,16 @@ window.onload = function () {
 
         });
 
-        document.querySelector('#input').onkeypress = function (e) {
+        document.querySelector('#message-input').onkeypress = function (e) {
             if (e.which == '13') {
-                socket.send({event: 'message', text: escape(document.querySelector('#input').value)});
-                document.querySelector('#input').value = '';
+                socket.send({event: 'message', text: escape(document.querySelector('#message-input').value)});
+                document.querySelector('#message-input').value = '';
             }
         };
 
         document.querySelector('#send').onclick = function () {
-            socket.send(escape(document.querySelector('#input').value));
-            document.querySelector('#input').value = '';
+            socket.send({event: 'message', text: escape(document.querySelector('#message-input').value)});
+            document.querySelector('#message-input').value = '';
         };
     });
 };

@@ -1,9 +1,9 @@
 body {
     background-color: #FBF8F1;
+    align-content: center;
 }
 
 .header {
-    /*width: auto;*/
     text-align: center;
     display: table;
     width: 100%;
@@ -33,51 +33,43 @@ body {
 }
 
 .chat {
+    /*width: 590px;*/
     width: 100%;
     text-align: center;
 }
 
 #log {
-    width: 590px;
+    width: 50%;
+    margin: 8px 8px 8px 25%;
     height: 290px;
+    color: #756D64;
     border: 1px solid rgb(192, 192, 192);
-    padding: 5px;
-    margin: 10px;
     font: 11pt 'Palatino Linotype';
     overflow: auto;
 }
 
-/* thanks 2048 for colors */
+.message-input {
+    height: 16px;
+    margin: 4px;
+}
 
-/*#log {*/
-/*width: 590px;*/
-/*height: 290px;*/
-/*border: 1px solid rgb(192, 192, 192);*/
-/*padding: 5px;*/
-/*margin-bottom: 5px;*/
-/*font: 11pt 'Palatino Linotype';*/
-/*overflow: auto;*/
-/*}*/
-/*#input {*/
-/*width: 550px;*/
-/*}*/
-/*#send {*/
-/*width: 50px;*/
-/*}*/
+#message-input {
+    width: 45%;
+    padding: 10px;
+    color: #756D64;
+}
 
-/*.in {*/
-/*color: rgb(0, 0, 0);*/
-/*}*/
-/*.out {*/
-/*color: rgb(0, 0, 0);*/
-/*}*/
-/*.time {*/
-/*color: rgb(144, 144, 144);*/
-/*font: 10pt 'Courier New';*/
-/*}*/
-/*.system {*/
-/*color: rgb(165, 42, 42);*/
-/*}*/
-/*.user {*/
-/*color: rgb(25, 25, 112);*/
-/*}*/
+#send {
+    width: 5%;
+    height: 32px;
+    color: #756D64;
+    border-radius: 4px;
+    background-color: #EFC53F;
+}
+
+.footer{
+    text-align: center;
+    font-size: small;
+    width: 100%;
+    color: #756D64;
+}
