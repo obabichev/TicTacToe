@@ -4,6 +4,9 @@ var io = require('socket.io').listen(8080);
 var logic = require('../interactor/logic');
 var players = require('../interactor/players');
 
+var ID;
+var name;
+
 function welcomeNewUser(socket, name) {
     socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer()});
     socket.broadcast.json.send({event: 'userJoined', name: name, 'time': time()});
@@ -15,64 +18,80 @@ function time() {
 
 io.sockets.on('connection', function (socket) {
 
-    var ID = (socket.id).toString();
+    ID = (socket.id).toString();
     players.addPlayer(ID);
 
-    var name = players.getPlayer(ID).name;
-    var time = (new Date).toLocaleTimeString();
+    name = players.getPlayer(ID).name;
 
     welcomeNewUser(socket, name);
 
-    socket.on('message', function (msg) {
-        time = (new Date).toLocaleTimeString();
+    socket.on('message', onMessage);
+
+    socket.on('disconnect', onDisconnect);
+
+    function onMessage(msg) {
         console.log("MSG:" + name + ":" + JSON.stringify(msg));
 
         if (msg.event == 'hit' && !logic.isGameEnd()) {
+            tryHit(msg.row, msg.column);
+        }
 
-            let hitResult = logic.tryHit(ID, msg.row, msg.column);
-            if (hitResult) {
+        if (msg.event == 'message') {
+            sendTextMessage(msg.text);
+        }
+    }
 
-                if (hitResult.win) {
-                    io.sockets.json.send({
-                        event: 'win',
-                        name: name,
-                        time: time,
-                        data: hitResult
-                    });
-                    var timeId = setTimeout(()=> {
-                        logic.reset();
-                        io.sockets.json.send({
-                            event: 'newGame',
-                            time: time,
-                            mapHeight: logic.getMapSize()[0],
-                            mapWidth: logic.getMapSize()[1],
-                        });
-                    }, 3000);
+    function sendTextMessage() {
+        socket.json.send({event: 'messageSent', name: name, 'text': text, time: time()});
+        socket.broadcast.json.send({event: 'messageReceived', name: name, text: text, time: time()})
+    }
 
-                } else {
-
-                    console.log("Hit success");
-                    io.sockets.json.send({
-                        event: 'successHit',
-                        name: name,
-                        time: time,
-                        next: players.getCurrentPlayer(),
-                        data: hitResult
-                    });
-                }
+    function tryHit(row, column) {
+        let hitResult = logic.tryHit(ID, row, column);
+        if (hitResult) {
+            if (hitResult.win) {
+                notifyAboutWin(hitResult);
+                var timerId = createResetGameTime(3000);
+            } else {
+                notifyAboutSuccessHit(hitResult);
             }
         }
-        if (msg.event == 'message') {
-            var time = (new Date).toLocaleTimeString();
-            socket.json.send({'event': 'messageSent', 'name': name, 'text': msg.text, 'time': time});
-            socket.broadcast.json.send({'event': 'messageReceived', 'name': name, 'text': msg.text, 'time': time})
-        }
-    });
+    }
 
-    socket.on('disconnect', function () {
-        var time = (new Date).toLocaleTimeString();
-        io.sockets.json.send({'event': 'userSplit', 'name': name, 'time': time, next: players.getCurrentPlayer()});
-        players.deletePlayer(ID);
-    });
+    function notifyAboutSuccessHit(hitResult) {
+        io.sockets.json.send({
+            event: 'successHit',
+            name: name,
+            time: time(),
+            next: players.getCurrentPlayer(),
+            data: hitResult
+        });
+    }
+
+    function notifyAboutWin(hitResult) {
+        io.sockets.json.send({
+            event: 'win',
+            name: name,
+            time: time(),
+            data: hitResult
+        });
+    }
+
+    function createResetGameTime(delay) {
+        return setTimeout(()=> {
+            logic.reset();
+            io.sockets.json.send({
+                event: 'newGame',
+                time: time(),
+                mapHeight: logic.getMapSize()[0],
+                mapWidth: logic.getMapSize()[1],
+            });
+        }, delay);
+    }
 });
+
+function onDisconnect() {
+    io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
+    players.deletePlayer(ID);
+}
 
