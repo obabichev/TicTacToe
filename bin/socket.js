@@ -41,7 +41,7 @@ io.sockets.on('connection', function (socket) {
         }
     }
 
-    function sendTextMessage() {
+    function sendTextMessage(text) {
         socket.json.send({event: 'messageSent', name: name, 'text': text, time: time()});
         socket.broadcast.json.send({event: 'messageReceived', name: name, text: text, time: time()})
     }
