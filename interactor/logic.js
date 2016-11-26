@@ -92,27 +92,21 @@ module.exports = {
         }
 
         map[row][column] = players.getCurrentPlayer().symbol;
+        let hitResult = {row: row, column: column, symbol: map[row][column]}
 
         if (isWin()) {
             gameEnd = true;
             return {
                 win: players.getCurrentPlayer(),
-                hit: {
-                    row: row,
-                    column: column,
-                    symbol: map[row][column]
-                }
+                hit: hitResult
             }
         }
 
         players.nextPlayer();
+
         return {
             next: players.getCurrentPlayer(),
-            hit: {
-                row: row,
-                column: column,
-                symbol: map[row][column]
-            }
+            hit: hitResult
         };
     },
 
