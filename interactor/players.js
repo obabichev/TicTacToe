@@ -58,6 +58,9 @@ module.exports = {
     },
 
     addPlayer(playerId){
+        if(players.length == 0){
+            nextAvailableIndex = 0;
+        }
         players.push({
             id: playerId,
             symbol: playerSymbol(nextAvailableIndex),
@@ -67,8 +70,6 @@ module.exports = {
             currentPlayer = players[0];
         }
         nextAvailableIndex += 1;
-        console.log("Player " + playerId + " added");
-        console.log("Players after adding " + JSON.stringify(players));
 
         return currentPlayer;
     },
@@ -79,7 +80,6 @@ module.exports = {
         }
         let index = indexOfPlayer(playerId);
         players.splice(index, index + 1);
-        console.log("Players after delete " + JSON.stringify(players));
         return currentPlayer;
     },
 };

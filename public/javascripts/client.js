@@ -30,7 +30,9 @@ function onMessage(msg) {
 
     updateLog(msg);
 
-    updateNextPlayer(msg.next);
+    if (msg.next) {
+        updateNextPlayer(msg.next);
+    }
 
     if (msg.data && msg.data.hit) {
         document.getElementById(msg.data.hit.row + ' ' + msg.data.hit.column).value = msg.data.hit.symbol;
@@ -71,9 +73,7 @@ function updateLog(msg) {
 }
 
 function updateNextPlayer(next) {
-    if (next) {
-        document.getElementById('nextPlayer').innerHTML = 'Очередь игрока ' + next.name;
-    }
+    document.getElementById('nextPlayer').innerHTML = 'Очередь игрока ' + next.name;
 }
 
 function reset(mapHeight, mapWidth) {
