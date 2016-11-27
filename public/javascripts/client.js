@@ -24,8 +24,15 @@ function connect() {
 }
 
 function onMessage(msg) {
+
+    console.log(JSON.stringify(msg));
+
     if (msg.event == 'connected') {
         updatePlayerName(msg.name);
+    }
+
+    if (msg.state){
+        updateState(msg.state);
     }
 
     updateLog(msg);
@@ -45,6 +52,12 @@ function onMessage(msg) {
 
 function updatePlayerName(name) {
     document.getElementById('login').innerHTML = 'Ваш логин: ' + name;
+}
+
+function updateState(state){
+    for (let i in state){
+        document.getElementById(i).value = state[i];
+    }
 }
 
 function updateLog(msg) {

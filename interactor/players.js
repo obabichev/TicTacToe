@@ -1,5 +1,7 @@
 'use strict';
 
+var logic = require('./logic');
+
 var nextAvailableIndex = 0;
 var players = [];
 var currentPlayer = '';
@@ -30,7 +32,14 @@ function indexOfPlayer(playerId) {
 
 module.exports = {
 
+    getNumberOfPlayers(){
+        return players.length;
+    },
+
     getCurrentPlayer(){
+        if (players.length == 0){
+            return;
+        }
         return currentPlayer;
     },
 
@@ -58,7 +67,7 @@ module.exports = {
     },
 
     addPlayer(playerId){
-        if(players.length == 0){
+        if (players.length == 0) {
             nextAvailableIndex = 0;
         }
         players.push({

@@ -4,9 +4,24 @@ var io = require('socket.io').listen(8080);
 var logic = require('../interactor/logic');
 var players = require('../interactor/players');
 
+
 function welcomeNewUser(socket, name) {
-    socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer()});
+    console.log("user " + name + " connected");
+
+    socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer(), state: makeStateObject()});
     socket.broadcast.json.send({event: 'userJoined', name: name, 'time': time()});
+}
+
+function makeStateObject(){
+    let map = logic.getMap();
+    let dim = logic.getMapSize();
+    let state = {};
+    for (let i = 0; i < dim[0]; i++) {
+        for (let j = 0; j < dim[1]; j++) {
+            state[i + ' ' + j] = map[i][j];
+        }
+    }
+    return state;
 }
 
 function time() {
@@ -88,10 +103,17 @@ io.sockets.on('connection', function (socket) {
 
 function onDisconnect(ID, name) {
     return () => {
-        io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
-        players.deletePlayer(ID);
-        io.sockets.json.send({event: 'nextPlayer', time: time(), next: players.getCurrentPlayer()});
-        console.log("Player " + name + " disconnected.")
+        deletePlayer(ID, name);
+        if (players.getNumberOfPlayers() == 0){
+            logic.reset();
+        }
+        console.log("Player " + name + " disconnected.");
     }
+}
+
+function deletePlayer(ID, name){
+    io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
+    players.deletePlayer(ID);
+    io.sockets.json.send({event: 'nextPlayer', time: time(), next: players.getCurrentPlayer()});
 }
 

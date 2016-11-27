@@ -8,6 +8,8 @@ var app = require('../app');
 var debug = require('debug')('tictactoe:server');
 var http = require('http');
 var socket = require('./socket');
+var logic = require('../interactor/logic');
+
 
 /**
  * Get port from environment and store in Express.
