@@ -2,6 +2,9 @@
 
 var socket;
 
+var currentPlayerId = null;
+var changePlayerTimer = null;
+
 function sendClick(row, column) {
     socket.send({event: 'hit', row: row, column: column});
 }
@@ -31,14 +34,18 @@ function onMessage(msg) {
         updatePlayerName(msg.name);
     }
 
-    if (msg.state){
+    if (msg.state) {
         updateState(msg.state);
     }
 
     updateLog(msg);
 
     if (msg.next) {
-        updateNextPlayer(msg.next);
+        if (currentPlayerId != msg.next.id) {
+            currentPlayerId = msg.next.id;
+            startTimer();
+        }
+        updateNextPlayerField(msg.next);
     }
 
     if (msg.data && msg.data.hit) {
@@ -50,12 +57,23 @@ function onMessage(msg) {
     }
 }
 
+function startTimer() {
+    clearInterval(changePlayerTimer);
+    var leftTime = 10;
+    changePlayerTimer = setInterval(()=> {
+        if (leftTime > 0) {
+            leftTime -= 1;
+        }
+        document.getElementById('timer').innerHTML = leftTime;
+    }, 1000);
+}
+
 function updatePlayerName(name) {
     document.getElementById('login').innerHTML = 'Ваш логин: ' + name;
 }
 
-function updateState(state){
-    for (let i in state){
+function updateState(state) {
+    for (let i in state) {
         document.getElementById(i).value = state[i];
     }
 }
@@ -86,7 +104,7 @@ function updateLog(msg) {
     }
 }
 
-function updateNextPlayer(next) {
+function updateNextPlayerField(next) {
     document.getElementById('nextPlayer').innerHTML = 'Очередь игрока ' + next.name;
 }
 

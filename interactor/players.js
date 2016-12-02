@@ -53,7 +53,9 @@ module.exports = {
     },
 
     nextPlayer() {
-
+        if (players.length == 0){
+            return;
+        }
         let index = this.indexOfCurrentPlayer();
         index += 1;
         if (index >= players.length) {

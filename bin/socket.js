@@ -4,15 +4,22 @@ var io = require('socket.io').listen(8080);
 var logic = require('../interactor/logic');
 var players = require('../interactor/players');
 
+var changePlayerTimer = null;
 
 function welcomeNewUser(socket, name) {
     console.log("user " + name + " connected");
 
-    socket.json.send({event: 'connected', name: name, time: time(), next: players.getCurrentPlayer(), state: makeStateObject()});
+    socket.json.send({
+        event: 'connected',
+        name: name,
+        time: time(),
+        next: players.getCurrentPlayer(),
+        state: makeStateObject()
+    });
     socket.broadcast.json.send({event: 'userJoined', name: name, 'time': time()});
 }
 
-function makeStateObject(){
+function makeStateObject() {
     let map = logic.getMap();
     let dim = logic.getMapSize();
     let state = {};
@@ -65,11 +72,12 @@ io.sockets.on('connection', function (socket) {
                 createResetGameTime(3000);
             } else {
                 notifyAboutSuccessHit(hitResult);
-                if (logic.isFieldEnded()){
+                if (logic.isFieldEnded()) {
                     notifyAboutEndOfField();
                     createResetGameTime(3000);
                 }
             }
+            updateChangePlayerTimer();
         }
     }
 
@@ -80,6 +88,22 @@ io.sockets.on('connection', function (socket) {
             time: time(),
             next: players.getCurrentPlayer(),
             data: hitResult
+        });
+    }
+
+    function updateChangePlayerTimer() {
+        clearInterval(changePlayerTimer);
+        changePlayerTimer = setInterval(()=> {
+            players.nextPlayer();
+            notifyAboutNextPlayer();
+        }, 10000);
+    }
+
+    function notifyAboutNextPlayer() {
+        io.sockets.json.send({
+            event: 'nextPlayer',
+            time: time(),
+            next: players.getCurrentPlayer(),
         });
     }
 
@@ -115,14 +139,14 @@ io.sockets.on('connection', function (socket) {
 function onDisconnect(ID, name) {
     return () => {
         deletePlayer(ID, name);
-        if (players.getNumberOfPlayers() == 0){
+        if (players.getNumberOfPlayers() == 0) {
             logic.reset();
         }
         console.log("Player " + name + " disconnected.");
     }
 }
 
-function deletePlayer(ID, name){
+function deletePlayer(ID, name) {
     io.sockets.json.send({event: 'userSplit', name: name, time: time(), next: players.getCurrentPlayer()});
     players.deletePlayer(ID);
     io.sockets.json.send({event: 'nextPlayer', time: time(), next: players.getCurrentPlayer()});
