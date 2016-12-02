@@ -21,6 +21,18 @@ function init() {
     gameEnd = false;
 }
 
+function getNumberOfEmptyFiels(){
+    let result = 0;
+    for (let i = 0; i < height; i++){
+        for (let j = 0; j < width; j++){
+            if (!map[i][j]){
+                result++;
+            }
+        }
+    }
+    return result;
+}
+
 function isWin() {
     let symbol = players.getCurrentPlayer().symbol;
 
@@ -116,5 +128,9 @@ module.exports = {
 
     isGameEnd(){
         return gameEnd;
+    },
+
+    isFieldEnded(){
+        return getNumberOfEmptyFiels() == 0;
     }
 };

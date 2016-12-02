@@ -62,9 +62,13 @@ io.sockets.on('connection', function (socket) {
         if (hitResult) {
             if (hitResult.win) {
                 notifyAboutWin(hitResult);
-                var timerId = createResetGameTime(3000);
+                createResetGameTime(3000);
             } else {
                 notifyAboutSuccessHit(hitResult);
+                if (logic.isFieldEnded()){
+                    notifyAboutEndOfField();
+                    createResetGameTime(3000);
+                }
             }
         }
     }
@@ -85,6 +89,13 @@ io.sockets.on('connection', function (socket) {
             name: name,
             time: time(),
             data: hitResult
+        });
+    }
+
+    function notifyAboutEndOfField() {
+        io.sockets.json.send({
+            event: 'end',
+            time: time(),
         });
     }
 

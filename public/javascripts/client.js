@@ -70,6 +70,7 @@ function updateLog(msg) {
         'userSplit': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] покинул игру.[/sys]',
         'win': '[sys][time]%time%[/time]: Игрок [user]%name%[/user] победил.[/sys]',
         'newGame': '[sys][time]%time%[/time]: Началась новая игра.[/sys]',
+        'end': '[sys][time]%time%[/time]: Закончилось место для ходов >_<.[/sys]'
     };
 
     if (strings[msg.event]) {
